@@ -25,7 +25,7 @@ class ProductFactory(factory.django.DjangoModelFactory):
 
         if extracted:
             for category in extracted:
-                self.category.add(category)
+                self.category.add(category)#o self é o product dai dentro o product tem a category criada como manyTomany, dai o for passa por uma lista de categorias dai faz a interação pra cada categoria to passando uma categoria individual para o produto q nois criamos
 
     class Meta:
         model = Product
