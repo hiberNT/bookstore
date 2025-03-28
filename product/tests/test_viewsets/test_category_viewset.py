@@ -32,7 +32,7 @@ class CategoryViewSet(APITestCase):
             content_type="application/json",
         )
         
-        import pdb; pdb.set_trace() #debug de python
+        #import pdb; pdb.set_trace() #debug de python
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 

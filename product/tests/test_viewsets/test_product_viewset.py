@@ -15,6 +15,8 @@ class TestProductViewSet(APITestCase):
 
     def setUp(self):
         self.user = UserFactory()#criando usuario
+        token = Token.objects.create(user=self.user)# para funcinar a autenticação
+        token.save() 
         
         self.product = ProductFactory(#criando produto
             title="pro controller",
@@ -22,6 +24,9 @@ class TestProductViewSet(APITestCase):
         )
 
     def test_get_all_product(self): #testando se os produtos estao listados
+        token = Token.objects.get(user__username=self.user.username)#passando o usuario criado ali em cima no setup
+        self.client.credentials(#adicionando as credenciais as chaves do token,fazendo justamente aqui pra que quando passr pelo get pegar esse token
+            HTTP_AUTHORIZATION="Token " + token.key)
         response = self.client.get(
             reverse("product-list", kwargs={"version": "v1"}) #listando os produtos que criamos a cima no setUp
         )
