@@ -18,7 +18,7 @@ class TestOrderViewSet(APITestCase):
         self.category = CategoryFactory(title="technology")#criando categoria com factory
         self.product = ProductFactory(title="mouse", price=100, category=[self.category]) #criando um produto e passando que vou criar uma lista[] de categorias pois la no factories product passei o for nas categorias
         self.order = OrderFactory(product=[self.product])
-
+        
     def test_order(self):
         response = self.client.get(
             reverse("order-list", kwargs={"version": "v1"}))
@@ -41,6 +41,8 @@ class TestOrderViewSet(APITestCase):
             data=data,
             content_type="application/json",
         )
+        
+        print(response.status_code, response.json())
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)#pra validar se deu certo 201 status do create
 
