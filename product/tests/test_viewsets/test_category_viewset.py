@@ -21,7 +21,7 @@ class CategoryViewSet(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK) #resposta do get status  200 que é oq dar quando esta ok
         category_data = json.loads(response.content)#se passou do get agora cria o data como json para fazer alguma validações
 
-        self.assertEqual(category_data["results"][0]["title"], self.category.title) #uma vez que tenho os dados em json podemos testar o title criado
+        self.assertEqual(category_data[0]["title"], self.category.title) #uma vez que tenho os dados em json podemos testar o title criado
 
     def test_create_category(self): #criando nova categoria
         data = json.dumps({"title": "technology"})
