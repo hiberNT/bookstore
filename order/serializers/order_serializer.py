@@ -15,7 +15,7 @@ class OrderSerializer(serializers.ModelSerializer): #model serializer vai extend
 
     class Meta:
         model = Order
-        fields = ["product", "total", "user", "products_id"]
+        fields = ["product", "total", "user", "products_id"] #o quero que apareça no json
         extra_kwargs = {"product": {"required": False}}
                
     def create(self, validated_data): #Esse método é chamado quando o serializer recebe dados válidos e precisa criar um novo objeto no banco. validated_data contém os dados que foram enviados na requisição e passaram pela validação do serializer.

@@ -19,11 +19,12 @@ class CategoryViewSet(APITestCase):
             reverse("category-list", kwargs={"version": "v1"}))
 
         self.assertEqual(response.status_code, status.HTTP_200_OK) #resposta do get status  200 que é oq dar quando esta ok
+        
         category_data = json.loads(response.content)#se passou do get agora cria o data como json para fazer alguma validações
 
-        self.assertEqual(category_data["results"][0]["title"], self.category.title) #uma vez que tenho os dados em json podemos testar o title criado
-
-    def test_create_category(self): #criando nova categoria
+        self.assertEqual(category_data["results"][0]["title"], self.category.title) #uma vez que tenho os dados em json podemos testar o title criado, comparando o category data que pegou a resposta em json e trasformou em biblioteca com o category criado no set up
+    def test_create_category(self): 
+        #criando nova categoria
         data = json.dumps({"title": "technology"})
 
         response = self.client.post(

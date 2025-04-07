@@ -26,11 +26,14 @@ class TestOrderViewSet(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         #fazendo uma revalidação para ve se tudo que criei deu certo
         order_data = json.loads(response.content)#carrega o json que recebo do viewset
-        self.assertEqual(order_data [0]["product"][0]["title"], self.product.title)#comparando o json com o item criado aqui, passa o indice 0 
-        self.assertEqual(order_data [0]["product"][0]["price"], self.product.price)
-        self.assertEqual(order_data [0]["product"][0]["active"], self.product.active)
-        self.assertEqual(order_data [0]["product"][0]["category"][0]["title"],self.category.title,)
-
+        print(order_data)
+        results = order_data["results"]
+        self.assertEqual(results[0]["product"][0]["title"], self.product.title)
+        #self.assertEqual(order_data [0]["product"][0]["title"], self.product.title)#comparando o json com o item criado aqui, passa o indice 0 
+        self.assertEqual(results [0]["product"][0]["price"], self.product.price)
+        self.assertEqual(results [0]["product"][0]["active"], self.product.active)
+        self.assertEqual(results [0]["product"][0]["category"][0]["title"],self.category.title,)
+        
     def test_create_order(self):#criando uma nova order
         user = UserFactory()
         product = ProductFactory()
