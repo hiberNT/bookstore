@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "order",
     "product",
+    "rest_framework.authtoken",
 ]
 
 MIDDLEWARE = [
@@ -136,4 +137,9 @@ INTERNAL_IPS = [
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 5,
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.BasicAuthentication",#adcionando uma segurança ao projeto, o basic é uma atenticaçao base para outras atenticaçoes ele aguarda
+        "rest_framework.authentication.SessionAuthentication",#guarda a autenticação dentro de uma sessao
+        "rest_framework.authentication.TokenAuthentication",
+    ]
 }

@@ -15,6 +15,8 @@ class TestProductViewSet(APITestCase):
 
     def setUp(self):
         self.user = UserFactory()#criando usuario
+        token = Token.objects.create(user=self.user)# para funcinar a autenticação
+        token.save() 
         
         self.product = ProductFactory(#criando produto
             title="pro controller",
@@ -22,24 +24,30 @@ class TestProductViewSet(APITestCase):
         )
 
     def test_get_all_product(self): #testando se os produtos estao listados
+        token = Token.objects.get(user__username=self.user.username)#passando o usuario criado ali em cima no setup
+        self.client.credentials(#adicionando as credenciais as chaves do token,fazendo justamente aqui pra que quando passr pelo get pegar esse token
+            HTTP_AUTHORIZATION="Token " + token.key)
         response = self.client.get(
             reverse("product-list", kwargs={"version": "v1"}) #listando os produtos que criamos a cima no setUp
         )
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         product_data = json.loads(response.content)
-
-        self.assertEqual(product_data[0]["title"], self.product.title)
-        self.assertEqual(product_data[0]["price"], self.product.price)
-        self.assertEqual(product_data[0]["active"], self.product.active)
+        print(product_data)
+        results = product_data["results"]
+        self.assertEqual(results[0]["title"], self.product.title)#o assert é para verificar se 2 valores sao iguais, verificando se o data que vem do get ta igual o setup
+        self.assertEqual(results[0]["price"], self.product.price)
+        self.assertEqual(results[0]["active"], self.product.active)
 
     def test_create_product(self): #criando produto novo
+        token = Token.objects.get(user__username=self.user.username)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
         category = CategoryFactory()
         data = json.dumps(
             {"title": "notebook", "price": 800.00,
                 "categories_id": [category.id]}
         )
-
+        
         response = self.client.post(
             reverse("product-list", kwargs={"version": "v1"}),
             data=data, #o data seria as informaçoes do nosso payload informaçoes que estamos enviando peo viewset
