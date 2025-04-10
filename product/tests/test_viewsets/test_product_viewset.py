@@ -1,7 +1,6 @@
 import json
 
 from django.urls import reverse
-from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 from rest_framework.views import status
 
@@ -14,19 +13,12 @@ class TestProductViewSet(APITestCase):
     client = APIClient()
 
     def setUp(self):
-        self.user = UserFactory()#criando usuario
-        token = Token.objects.create(user=self.user)# para funcinar a autenticação
-        token.save() 
-        
         self.product = ProductFactory(#criando produto
             title="pro controller",
             price=200.00,
         )
 
     def test_get_all_product(self): #testando se os produtos estao listados
-        token = Token.objects.get(user__username=self.user.username)#passando o usuario criado ali em cima no setup
-        self.client.credentials(#adicionando as credenciais as chaves do token,fazendo justamente aqui pra que quando passr pelo get pegar esse token
-            HTTP_AUTHORIZATION="Token " + token.key)
         response = self.client.get(
             reverse("product-list", kwargs={"version": "v1"}) #listando os produtos que criamos a cima no setUp
         )
@@ -40,8 +32,6 @@ class TestProductViewSet(APITestCase):
         self.assertEqual(results[0]["active"], self.product.active)
 
     def test_create_product(self): #criando produto novo
-        token = Token.objects.get(user__username=self.user.username)
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
         category = CategoryFactory()
         data = json.dumps(
             {"title": "notebook", "price": 800.00,
