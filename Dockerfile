@@ -28,9 +28,9 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 # Definir diretório de trabalho
 WORKDIR $PYSETUP_PATH
 
-# Copiar arquivos de dependência
+# Copiar arquivos de dependência # importante para evitar erro do poetry
 COPY poetry.lock pyproject.toml ./
-COPY README.md ./  # importante para evitar erro do poetry
+COPY README.md ./  
 
 # Instalar dependências sem pacotes de dev
 RUN poetry install --no-root
