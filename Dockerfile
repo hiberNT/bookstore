@@ -25,6 +25,11 @@ RUN apt-get update && \
 # Instalar o Poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
+#install postgres dependencies 
+RUN apt-get update \
+    && apt-get -y install libpq-dev gcc \
+    && pip install psycopg2 
+
 # Definir diretório de trabalho
 WORKDIR $PYSETUP_PATH
 
