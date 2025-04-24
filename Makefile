@@ -1,5 +1,8 @@
+SHELL := pwsh.exe
+.SHELLFLAGS := -NoProfile -Command
+
 # Set this to ~use it everywhere in the project setup
-PYTHON_VERSION ?= 3.8.10
+PYTHON_VERSION ?= 3.12.0
 # the directories containing the library modules this repo builds
 LIBRARY_DIRS = mylibrary
 # build artifacts organized in this Makefile
@@ -14,14 +17,12 @@ PYTEST_OPTIONS ?= $(PYTEST_HTML_OPTIONS) $(PYTEST_TAP_OPTIONS) $(PYTEST_COVERAGE
 # MyPy typechecking options
 MYPY_OPTS ?= --python-version $(basename $(PYTHON_VERSION)) --show-column-numbers --pretty --html-report $(BUILD_DIR)/mypy
 # Python installation artifacts
-PYTHON_VERSION_FILE=.python-version
-ifeq ($(shell which pyenv),)
-# pyenv isn't installed, guess the eventual path FWIW
-PYENV_VERSION_DIR ?= $(HOME)/.pyenv/versions/$(PYTHON_VERSION)
-else
-# pyenv is installed
-PYENV_VERSION_DIR ?= $(shell pyenv root)/versions/$(PYTHON_VERSION)
-endif
+# PYTHON_VERSION_FILE=.python-version
+# ifeq ($(shell (Get-Command pyenv -ErrorAction SilentlyContinue).Path),)
+# PYENV_VERSION_DIR ?= $(HOME)/.pyenv/versions/$(PYTHON_VERSION)
+# else
+# PYENV_VERSION_DIR ?= $(shell pyenv root)/versions/$(PYTHON_VERSION)
+# endif
 PIP ?= pip3
 
 POETRY_OPTS ?=
@@ -35,7 +36,13 @@ COLOR_RESET = \033[0m
 
 .PHONY: help
 help:  ## Display this help
-	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m\033[0m\n"} /^[a-zA-Z0-9_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+	@powershell -Command " \
+		$$help = Get-Content Makefile | Select-String '^([a-zA-Z0-9_-]+):.*?## (.*)$$'; \
+		$$help | ForEach-Object { \
+			$$matches = $$_.Matches; \
+			Write-Host (\"  {0,-15} {1}\" -f $$matches.Groups[1].Value, $$matches.Groups[2].Value) -ForegroundColor Cyan \
+		} \
+	"
 
 .PHONY: version-python
 version-python: ## Echos the version of Python in use
@@ -65,10 +72,10 @@ deps-py-update: pyproject.toml ## Update Poetry deps, e.g. after adding a new on
 
 ##@ Setup
 # dynamic-ish detection of Python installation directory with pyenv
-$(PYENV_VERSION_DIR):
-	pyenv install --skip-existing $(PYTHON_VERSION)
-$(PYTHON_VERSION_FILE): $(PYENV_VERSION_DIR)
-	pyenv local $(PYTHON_VERSION)
+# $(PYENV_VERSION_DIR):
+# 	pyenv install --skip-existing $(PYTHON_VERSION)
+# $(PYTHON_VERSION_FILE): $(PYENV_VERSION_DIR)
+# 	pyenv local $(PYTHON_VERSION)
 
 .PHONY: deps
 deps: deps-brew deps-py  ## Installs all dependencies
@@ -80,16 +87,12 @@ deps-brew: Brewfile ## Installs development dependencies from Homebrew
 	@echo "$(COLOR_ORANGE)It should have something like 'eval \$$(pyenv init -)'$(COLOR_RESET)"
 
 .PHONY: deps-py
-deps-py: $(PYTHON_VERSION_FILE) ## Installs Python development and runtime dependencies
-	$(PIP) install --upgrade \
-		--index-url $(PYPI_PROXY) \
-		pip
-	$(PIP) install --upgrade \
-                                     		--index-url $(PYPI_PROXY) \
-                                     		poetry
+deps-py:  ## Installs Python development and runtime dependencies
+	$(PIP) install --upgrade pip
+	$(PIP) install poetry
 	$(POETRY) install
 
-##@ Code Quality parte mais importante
+##@ Code Quality
 
 .PHONY: check
 check: check-py ## Runs linters and other important tools
