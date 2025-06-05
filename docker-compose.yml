@@ -6,7 +6,7 @@ services:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/usr/src/app/
+      - app_data:/usr/src/app/
     ports:
       - 8000:8000
     env_file:
@@ -17,12 +17,14 @@ services:
       - db
   db:
     image: postgres:13.0-alpine
+    ports: 
+      - 5433:5432 
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=dev
-      - POSTGRES_PASSWORD=dev
-      - POSTGRES_DB=bookstore_db
+      - POSTGRES_USER=bookstore_dev
+      - POSTGRES_PASSWORD=bookstore_dev
+      - POSTGRES_DB=bookstore_dev_db
     networks:
       - backend
 networks:
@@ -31,3 +33,5 @@ networks:
 
 volumes:
   postgres_data:
+  app_data:
+#fizemos esse app_data pra ficar melhor caso quisermos fazer uma atualização, dai usa como referencia o app_data se quiser acessar os volumes
